@@ -1525,7 +1525,9 @@ public class M6800CPU {
       */
 	 protected final int index()
 	  {
-		return ram.read(this.PC++ + this.X);		
+		//return ram.read(this.PC++ + this.X);		old solution
+		 //new solution
+		 return ram.read(ram.read(this.PC++)+this.X);
 	  }
 	 
 	 /*
