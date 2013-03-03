@@ -46,7 +46,7 @@ public class M6800CPU {
 	public void setSP(byte sP) {
 		SP = sP;
 	}
-	public byte getPC() {
+	public short getPC() {
 		return PC;
 	}
 	public void setPC(byte pC) {
@@ -742,17 +742,17 @@ public class M6800CPU {
 		    break;
 		//cpx
 		case 140:
-			cpx();
+			cpx(3);
 			break;
 			//
 		case 156:
-			cpx();
+			cpx(0);
 			break;
 		case 172:
-			cpx();
+			cpx(1);
 			break;
 		case 188:
-			cpx();
+			cpx(2);
 			break;
 		    
 		    
@@ -1312,8 +1312,10 @@ public class M6800CPU {
 		   }
 		   else if(addr==1)
 		   {
-			 ram.write(ram.read(this.PC++), conData[1]);
-			 ram.write(ram.read(this.PC++),conData[0]);
+			  short address1=combinationByteToShort(ram.read(this.PC++), ram.read(this.PC++));
+			  
+			 ram.write(address1++, conData[1]);
+			 ram.write(address1,conData[0]);
 		   }
 		   else if(addr==2)
 		   {
@@ -1346,15 +1348,21 @@ public class M6800CPU {
 		   }
 		   else if(addr==3)
 		   {
-			   conData[0]=ram.read(this.PC++);
-			   conData[1]=ram.read(this.PC++);
+			 //ram.write(ram.read(this.PC++), conData[1]);
+				 conData[0]=ram.read(ram.read(this.PC++));
+				 //ram.write(ram.read(this.PC++),conData[0]);
+				 conData[1]=ram.read(ram.read(this.PC++));
 		   }
 		   else if(addr==1)
 		   {
 			 //ram.write(ram.read(this.PC++), conData[1]);
-			 conData[0]=ram.read(ram.read(this.PC++));
-			 //ram.write(ram.read(this.PC++),conData[0]);
-			 conData[1]=ram.read(ram.read(this.PC++));
+				 conData[0]=ram.read(ram.read(this.PC++));
+				 //ram.write(ram.read(this.PC++),conData[0]);
+				 conData[1]=ram.read(ram.read(this.PC++));
+				 short address1=combinationByteToShort(conData[0],conData[1]);//in put of 
+				 short address2=(short) (address1+1);
+				 conData[0]=ram.read(address1);
+				 conData[0]=ram.read(address2); 
 			 
 		   }
 		   else if(addr==2)
@@ -1408,7 +1416,8 @@ public class M6800CPU {
 			 conData[1]=ram.read(ram.read(this.PC++));
 			 short address1=combinationByteToShort(conData[0],conData[1]);//in put of 
 			 short address2=(short) (address1+1);
-			 conData[0]=ram
+			 conData[0]=ram.read(address1);
+			 conData[0]=ram.read(address2);
 			 
 		   }
 		   else if(addr==2)
@@ -1470,8 +1479,10 @@ public class M6800CPU {
 		   }
 		   else if(addr==1)
 		   {
-			 ram.write(ram.read(this.PC++), conData[1]);
-			 ram.write(ram.read(this.PC++),conData[0]);
+			   short address1=combinationByteToShort(ram.read(this.PC++), ram.read(this.PC++));
+				  
+				 ram.write(address1++, conData[1]);
+				 ram.write(address1,conData[0]);
 		   }
 		   else if(addr==2)
 		   {
