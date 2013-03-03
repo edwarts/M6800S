@@ -20,7 +20,7 @@ public class M6800CPU {
 	private int negativeFlag = 0;//N
 	public M6800CPU(IRAM m_ram)
 	{
-		ram=m_ram;
+		ram=m_ram;//
 	}
 	public int getCycles() {
 		return cycles;
