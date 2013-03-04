@@ -102,7 +102,7 @@ public class M6800CPU {
 		int instr = ram.read(this.PC++);
 		switch(instr){
 		//A+B
-		case 39:
+		case 57:
 			rts();
 			break;
 		case 27:
@@ -699,15 +699,15 @@ public class M6800CPU {
 			subB(imm());
 			this.cycles+=2;
 			break;
-		case 208: //0x92 Direct SBCA SUBB B=B-M
+		case 208: //0xD0 Direct SBCA SUBB B=B-M
 			subB(direct());
 			this.cycles+=3;
 			break;		
-		case 224://0xA2indexed SBCA SUBB B=B-M
+		case 224://0xE0 indexed SBCA SUBB B=B-M
 			subB(index());
 			this.cycles+=5;
 			break;
-		case 240://0xB2 extended SUBB B=B-M
+		case 240://0xF0 extended SUBB B=B-M
 			subB(extend());
 			this.cycles+=4;
 			break;	
@@ -862,10 +862,53 @@ public class M6800CPU {
 		    brs();
 		    break;
 			
-		//
-			
-			
+		//the rest of instrunciton
+		case 32://0x20
+			this.PC++;
+			break;
+		case 36://0x24
+			if (getCarryFlag()==0)
+			{
+			stbrach();
+			}
+			else {
+			stnbrach();
+			}
+			break;
+		case 37://0x25
+			if(this.getCarryFlag()==1)
+			{
+			stbrach();
+			}
+			else {
+				stnbrach();
+			}
+			break;
+		case 39:
+			if(this.getZeroFlag()==1)
+			{
+				stbrach();
+			}
+			else {
+				stnbrach();
+			}
+			break;
+		case 44:
+			if((this.getNegativeFlag()+getOverflowFlag())==1||(this.getNegativeFlag()+this.getOverflowFlag())==0)
+			{
+				stbrach();
+			}
+			else {
+				stnbrach();
+			}
 		}
+	}
+	private void stbrach()
+	{
+		this.PC=(short) (this.PC+2+ram.read(this.PC));
+	}
+	private void stnbrach(){
+		this.PC+=2;
 	}
 	private void brs() {
 		//store current pc first
