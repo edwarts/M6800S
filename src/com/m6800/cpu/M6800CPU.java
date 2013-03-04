@@ -376,7 +376,7 @@ public class M6800CPU {
 			setflags(this.A);
 			this.cycles+=2;
 			break;
-		case 90://0xDA DECB B=B-1
+		case 90://0x5A DECB B=B-1
 			this.B-=1;
 			setflags(this.B);
 			this.cycles+=2;
@@ -429,7 +429,7 @@ public class M6800CPU {
 			setflags(this.A);
 			this.cycles+=2;
 			break;
-		case 92://0xDC INCB B=B+1
+		case 92://0x5C INCB B=B+1
 			this.B-=1;
 			setflags(this.B);
 			this.cycles+=2;
@@ -464,7 +464,7 @@ public class M6800CPU {
 			ldaB(index());
 			this.cycles+=5;
 			break;
-		case 246://0xF1 extended LDAB B=M
+		case 246://0xF6 extended LDAB B=M
 			ldaB(extend());
 			this.cycles+=4;
 			break;			
@@ -493,11 +493,11 @@ public class M6800CPU {
 			oraB(direct());
 			this.cycles+=3;
 			break;
-		case 234://0xE8 Index EORB
+		case 234://0xEA Index EORB
 			oraB(index());
 			this.cycles+=5;
 			break;
-		case 250://0xF8 extended EORB
+		case 250://0xFA extended EORB
 			oraB(extend());
 			this.cycles+=4;
 			break;
