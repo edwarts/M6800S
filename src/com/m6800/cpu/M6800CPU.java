@@ -1,8 +1,11 @@
 package com.m6800.cpu;
 
+import java.util.Stack;
+
 import com.m6800.ram.IRAM;
 
 public class M6800CPU {
+	public Stack<Short> pcstack=new Stack<Short>();//stack for submarine program
 	public IRAM ram;
 	public int cycles;
 	private byte A;//Accumulator A use 16bit
@@ -99,6 +102,9 @@ public class M6800CPU {
 		int instr = ram.read(this.PC++);
 		switch(instr){
 		//A+B
+		case 39:
+			rts();
+			break;
 		case 27:
 			aba();
 			break;
@@ -852,9 +858,52 @@ public class M6800CPU {
 			this.X=(byte) (this.SP-1);
 			this.cycles+=4;
 			break;
+		case 141://8D brach to submarine
+		    brs();
+		    break;
+			
 		//
 			
 			
+		}
+	}
+	private void brs() {
+		//store current pc first
+		pcstack.push(this.PC);
+		try {
+			this.PC=(short) (ram.read(this.PC++)+this.PC);
+		} catch (StackOverflowError es) {
+			// TODO: handle exception
+			System.out.println(es.toString());
+		}
+		
+		// TODO Auto-generated method stub
+		
+	}
+	private void rts() {
+		// TODO Auto-generated method stub
+		if (pcstack.empty()==false)
+		{
+			//not empty
+			try {
+				this.PC=pcstack.pop();
+				short testOverLimited=(short) (this.PC+1);
+				if(testOverLimited>0xc3fe)
+				{
+					System.out.println("Over system index limited");
+				}
+				else {
+					this.PC+=1;
+				}
+				
+			} catch (Exception es) {
+				System.out.println(es.toString());
+				// TODO: handle exception
+			}
+			
+		}
+		else {
+		  System.out.println("Empty pc list exception!");
 		}
 	}
 	//3 im
