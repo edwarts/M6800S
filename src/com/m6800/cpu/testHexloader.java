@@ -25,6 +25,18 @@ public class testHexloader {
 
 			k=(short)(k+(s2&0x00ff));
 			System.out.println(Integer.toHexString(k));
+			//short firstOP=Short.decode("0xCl").shortValue();
+			
+			try {
+				ROMHEXLoader romhex=new ROMHEXLoader("C:\\chipos.txt");
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (HEXloaderException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			//System.out.println(getbit(s,8));
 			
 		/*} catch (IOException e) {
