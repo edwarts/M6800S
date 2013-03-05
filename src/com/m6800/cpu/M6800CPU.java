@@ -863,9 +863,7 @@ public class M6800CPU {
 		    break;
 			
 		//the rest of instrunciton
-		case 32://0x20
-			this.PC++;
-			break;
+
 		case 36://0x24
 			if (getCarryFlag()==0)
 			{
@@ -893,15 +891,119 @@ public class M6800CPU {
 				stnbrach();
 			}
 			break;
-		case 44:
-			if((this.getNegativeFlag()+getOverflowFlag())==1||(this.getNegativeFlag()+this.getOverflowFlag())==0)
+		case 44://2C
+			if((this.getNegativeFlag()==1)&&(getOverflowFlag())==1||((this.getNegativeFlag()==1)&&(this.getOverflowFlag())==0))
 			{
 				stbrach();
 			}
 			else {
 				stnbrach();
 			}
+			break;
+		case 46://2E
+			if(((this.getZeroFlag()==0)&&(this.getOverflowFlag()==1)&&(this.getNegativeFlag()==1))||(this.getNegativeFlag()==0&&this.getOverflowFlag()==1))
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 34://22
+			if(this.getCarryFlag()==0||this.getZeroFlag()==0)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 47://2F
+			if((this.getZeroFlag()==1)||(this.getNegativeFlag()==1&&this.getOverflowFlag()==0)||(this.getNegativeFlag()==0&&this.getOverflowFlag()==0))
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 35://23
+			if(this.getCarryFlag()==1||this.getOverflowFlag()==1)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 45://2D
+			if((this.getNegativeFlag()==1&&this.getOverflowFlag()==0)||(this.getNegativeFlag()==0&&this.getOverflowFlag()==1))
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 43://2B
+			if(this.getNegativeFlag()==1)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+				
+			}
+			break;
+		case 38://26
+			if(this.getZeroFlag()==0)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 42://2A
+			if(this.getNegativeFlag()==0)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+			break;
+		case 32://20
+		   stbrach();
+		   break;
+		case 40://28
+			if(this.getOverflowFlag()==0)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
+		case 41://29
+			if(this.getOverflowFlag()==1)
+			{
+				stbrach();
+			}
+			else
+			{
+				stnbrach();
+			}
 		}
+		
 	}
 	private void stbrach()
 	{
