@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.sun.tools.internal.xjc.reader.gbind.OneOrMore;
+
 
 public class ROMHEXLoader {
 	private BufferedReader fileReader = null;
@@ -14,8 +16,8 @@ public class ROMHEXLoader {
 	 * @throws IOException
 	 * @throws HEXloaderException
 	 */
-	short[] rom=new short[0xc3fe];
-	public ROMHEXLoader(String file) throws IOException, HEXloaderException {
+	public short[] rom=new short[0xc3fe];
+	public ROMHEXLoader(String file) throws IOException{
 		fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 		int nbLines = 0;
 		
@@ -34,7 +36,7 @@ public class ROMHEXLoader {
 				{
 				short firstOP=Short.decode("0x"+str.substring(0,first)).shortValue();
 				str=str.substring(first+1);
-				System.out.println(firstOP);
+				//System.out.println(firstOP);
 				rom[k]=firstOP;
 				k++;
 				first=str.indexOf(" ");
@@ -43,9 +45,10 @@ public class ROMHEXLoader {
 				{
 					short firstOP=Short.decode("0x"+str).shortValue();
 					str=str.substring(first);
-					System.out.println(firstOP);
+					//System.out.println(firstOP);
 					rom[k]=firstOP;
 					k++;
+					first=str.indexOf(" ");
 				}
 				
 			}
@@ -54,6 +57,17 @@ public class ROMHEXLoader {
 			
 		}
 		fileReader.close();
+	/*	for(Short oneOp:rom)
+		{
+			System.out.println(Integer.toHexString(oneOp));
+		}*/
+		
+	}
+	public short[] getRom() {
+		return rom;
+	}
+	public void setRom(short[] rom) {
+		this.rom = rom;
 	}
 
 }

@@ -2,11 +2,16 @@ package com.m6800.cpu;
 
 import java.util.Stack;
 
+import javax.sound.midi.SysexMessage;
+
+import sun.tools.tree.ThisExpression;
+
 import com.m6800.ram.IRAM;
 
 public class M6800CPU {
 	public Stack<Short> pcstack=new Stack<Short>();//stack for submarine program
 	public IRAM ram;
+	public final short[] rom;
 	public int cycles;
 	private byte A;//Accumulator A use 16bit
 	private byte B;//Accumulator B use 16 bit
@@ -21,9 +26,10 @@ public class M6800CPU {
 	private int halfCarryFlag = 0;//H
 	private int overflowFlag = 0;//V
 	private int negativeFlag = 0;//N
-	public M6800CPU(IRAM m_ram)
+	public M6800CPU(IRAM m_ram,short[] m_rom)
 	{
 		ram=m_ram;//
+		rom=m_rom;
 	}
 	public int getCycles() {
 		return cycles;
@@ -52,7 +58,7 @@ public class M6800CPU {
 	public short getPC() {
 		return PC;
 	}
-	public void setPC(byte pC) {
+	public void setPC(short pC) {
 		PC = pC;
 	}
 	public short getX() {
@@ -98,8 +104,16 @@ public class M6800CPU {
 		this.negativeFlag = negativeFlag;
 	}
 	public final void runcycle() {
-
-		int instr = ram.read(this.PC++);
+        int instr=0;
+        System.out.println(PC);
+		if(this.PC>=0xC000)
+		{
+		instr = rom[this.PC++];
+		}
+		else {
+		instr=ram.read(this.PC++);
+		}
+		System.out.println(instr);
 		switch(instr){
 		//A+B
 		case 57:

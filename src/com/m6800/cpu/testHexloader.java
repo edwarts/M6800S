@@ -28,12 +28,9 @@ public class testHexloader {
 			//short firstOP=Short.decode("0xCl").shortValue();
 			
 			try {
-				ROMHEXLoader romhex=new ROMHEXLoader("C:\\chipos.txt");
+				ROMHEXLoader romhex=new ROMHEXLoader("chipos.txt");
 				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (HEXloaderException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
