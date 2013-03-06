@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 
 
 
-public class ROMHEXLoader {
+public class ROMHEXIntLoader {
 	private BufferedReader fileReader = null;
 	/**
 	 * Charge le fichier source binaire dans la ROM du microcontroleur (CORE_CPU8051.ROMemory).
@@ -16,8 +16,8 @@ public class ROMHEXLoader {
 	 * @throws IOException
 	 * @throws HEXloaderException
 	 */
-	public short[] rom=new short[0xc3fe];
-	public ROMHEXLoader(String file) throws IOException{
+	public int[] rom=new int[0xc3fe];
+	public ROMHEXIntLoader(String file) throws IOException{
 		fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 		int nbLines = 0;
 		
@@ -34,7 +34,7 @@ public class ROMHEXLoader {
 			{
 				if(!str.substring(0,first).equals(""))
 				{
-				short firstOP=Short.decode("0x"+str.substring(0,first)).shortValue();
+				int firstOP=Integer.decode("0x"+str.substring(0,first)).shortValue();
 				str=str.substring(first+1);
 				//System.out.println(firstOP);
 				rom[k]=firstOP;
@@ -43,7 +43,7 @@ public class ROMHEXLoader {
 				}
 				else
 				{
-					short firstOP=Short.decode("0x"+str).shortValue();
+					int firstOP=Integer.decode("0x"+str).shortValue();
 					str=str.substring(first);
 					//System.out.println(firstOP);
 					rom[k]=firstOP;
@@ -63,10 +63,10 @@ public class ROMHEXLoader {
 		}*/
 		
 	}
-	public short[] getRom() {
+	public int[] getRom() {
 		return rom;
 	}
-	public void setRom(short[] rom) {
+	public void setRom(int[] rom) {
 		this.rom = rom;
 	}
 

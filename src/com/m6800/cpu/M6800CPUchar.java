@@ -4,7 +4,7 @@ import java.util.Stack;
 
 import javax.sound.midi.SysexMessage;
 
-import sun.tools.tree.ThisExpression;
+
 
 import com.m6800.ram.IRAM;
 
@@ -58,8 +58,8 @@ public class M6800CPUchar {
 	public int getPC() {
 		return PC;
 	}
-	public void setPC(short pC) {
-		PC = pC;
+	public void setPC(int i) {
+		PC = i;
 	}
 	public int getX() {
 		return X;
@@ -111,7 +111,7 @@ public class M6800CPUchar {
 		instr = rom[this.PC++];
 		}
 		else {
-		instr=ram.read(this.PC++);
+			instr=ram.read(this.PC++);
 		}
 		System.out.println(instr);
 		switch(instr){

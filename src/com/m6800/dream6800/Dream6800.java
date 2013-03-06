@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Stack;
 
 import com.m6800.cpu.M6800CPU;
+import com.m6800.cpu.M6800CPUchar;
+import com.m6800.cpu.ROMHEXIntLoader;
 import com.m6800.cpu.ROMHEXLoader;
 import com.m6800.ram.IRAM;
 import com.m6800.ram.M6800RAM;
@@ -26,7 +28,7 @@ class HEXloaderException extends Exception {
 }
 public class Dream6800 {
 	public static IRAM ram;
-	public static M6800CPU cpu;
+	public static M6800CPUchar cpu;
     
 	/**
 	 * @param args
@@ -42,20 +44,20 @@ public class Dream6800 {
         ram=m68001kIram;		
 		//load rom
 		
-		ROMHEXLoader romhexLoader;
+		ROMHEXIntLoader romhexLoader;
 		try {
-			romhexLoader = new ROMHEXLoader("chipos.txt");
+			romhexLoader = new ROMHEXIntLoader("chipos.txt");
 			// sub status
 			System.out.println("Initialize the ROM");
-			short[] rom=romhexLoader.getRom();
-			cpu=new M6800CPU(ram,rom);
+			int[] rom=romhexLoader.getRom();
+			cpu=new M6800CPUchar(ram,rom);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		short k=0x7C00;
-		System.out.println(k);
-		cpu.setPC((short) 49152);
+		//short k=0x7C00;
+		//System.out.println(k);
+		cpu.setPC(49152);
 		while(true)
 		{
 			
