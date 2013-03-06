@@ -17,26 +17,24 @@ public class testHexloader {
 			//System.out.println(Integer.toHexString((int)k));
 			//byte y=(byte) (k>>4);
 			//System.out.println(y);
-			/*byte s=(byte) 0x8c;
+			byte s=(byte) 0x8c;
 			byte s2=(byte)0xd3;
-			short k=s;*/
+			short k=s;
 			//k=(short) (0x00ff&k);
-			/*k=(short) (k<<8);
+			k=(short) (k<<8);
 
 			k=(short)(k+(s2&0x00ff));
-			System.out.println(Integer.toHexString(k));*/
-			//short firstOP=Short.decode("0xCl").shortValue();
-		    
-			System.out.println(Integer.decode("0xC000"));
-			int k=Integer.decode("0xC000");
 			System.out.println(Integer.toHexString(k));
-			/*try {
+			//short firstOP=Short.decode("0xCl").shortValue();
+			
+			try {
 				ROMHEXLoader romhex=new ROMHEXLoader("chipos.txt");
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
+			
 			//System.out.println(getbit(s,8));
 			
 		/*} catch (IOException e) {

@@ -1021,7 +1021,7 @@ public class M6800CPUchar {
 	}
 	private void stbrach()
 	{
-		this.PC=(short) (this.PC+2+ram.read(this.PC));
+		this.PC=this.PC+2+ram.read(this.PC);
 	}
 	private void stnbrach(){
 		this.PC+=2;
@@ -1030,7 +1030,7 @@ public class M6800CPUchar {
 		//store current pc first
 		pcstack.push(this.PC);
 		try {
-			this.PC=(short) (ram.read(this.PC++)+this.PC);
+			this.PC= ram.read(this.PC++)+this.PC;
 		} catch (StackOverflowError es) {
 			// TODO: handle exception
 			System.out.println(es.toString());
@@ -1046,7 +1046,7 @@ public class M6800CPUchar {
 			//not empty
 			try {
 				this.PC=pcstack.pop();
-				short testOverLimited=(short) (this.PC+1);
+				int testOverLimited=this.PC+1;
 				if(testOverLimited>0xc3fe)
 				{
 					System.out.println("Over system index limited");
@@ -1100,7 +1100,7 @@ public class M6800CPUchar {
 	}
 	private void aba() {
 		// TODO Auto-generated method stub
-		byte result=(byte) (this.A+this.B);
+		int result=this.A+this.B;
 		this.overflowFlag=(result>128|result<-127)==true?1:0;
 		this.carryFlag=0;
 		this.halfCarryFlag=0;
@@ -1114,7 +1114,7 @@ public class M6800CPUchar {
 		{
 			this.negativeFlag=0;
 		}
-		this.A=result;
+		this.A=(byte)result;
 		imm();
 	}
 	/*
