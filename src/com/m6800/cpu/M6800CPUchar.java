@@ -1007,6 +1007,7 @@ public class M6800CPUchar {
 			{
 				stnbrach();
 			}
+			break;
 		case 41://29
 			if(this.getOverflowFlag()==1)
 			{
@@ -1016,6 +1017,29 @@ public class M6800CPUchar {
 			{
 				stnbrach();
 			}
+			break;
+		case 12://C
+			setCarryFlag(0);
+			break;
+		case 14://E
+			this.setInterruptMask((byte) 0);
+			break;
+		case 10://A
+			this.setOverflowFlag((byte) 0);
+			break;
+		case 13://D
+			this.setCarryFlag(1);
+			break;
+		case 15://F
+			this.setInterruptMask((byte) 1);
+		    break;
+		case 11://B
+			this.setOverflowFlag((byte) 1);
+			break;
+		case 6:
+			byte[] b=new byte[8];
+			b.
+			this.setA(Byte.valueOf(Integer.toBinaryString(i)));
 		}
 		
 	}
