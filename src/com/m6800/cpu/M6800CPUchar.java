@@ -1037,9 +1037,9 @@ public class M6800CPUchar {
 			this.setOverflowFlag((byte) 1);
 			break;
 		case 6:
-			byte[] b=new byte[8];
-			b.
-			this.setA(Byte.valueOf(Integer.toBinaryString(i)));
+	        int tmpa=1*2^7+1*2^6+this.getHalfCarryFlag()*(2^5)+this.getInterruptMask()*(2^4)+this.getNegativeFlag()*(2^3)+this.getZeroFlag()*(2^2)+this.getOverflowFlag()*(2^1)+this.getCarryFlag()*1;
+			this.setA(Byte.valueOf((byte)tmpa));
+			break;
 		}
 		
 	}

@@ -17,7 +17,7 @@ public class testHexloader {
 			//System.out.println(Integer.toHexString((int)k));
 			//byte y=(byte) (k>>4);
 			//System.out.println(y);
-			byte s=(byte) 0x8c;
+			/*byte s=(byte) 0x8c;
 			byte s2=(byte)0xd3;
 			short k=s;
 			//k=(short) (0x00ff&k);
@@ -34,7 +34,15 @@ public class testHexloader {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+			*/
+		//11101101
+		  double tmpa=1*Math.pow(2d, 7d)+1*Math.pow(2d, 6d)+1*Math.pow(2d, 5d)+0*Math.pow(2d, 4d)+1*Math.pow(2d, 3d)+1*Math.pow(2d, 2d)+0*Math.pow(2d, 1d)+1*1;
+		    System.out.println((int)tmpa);
+		    int kk=((int)tmpa);
+		    System.out.println(Byte.MAX_VALUE);
+		    System.out.println(Integer.MAX_VALUE);
+		    System.out.println();
+			System.out.println(Byte.valueOf((byte)tmpa));
 			//System.out.println(getbit(s,8));
 			
 		/*} catch (IOException e) {
