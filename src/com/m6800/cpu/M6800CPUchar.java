@@ -13,8 +13,8 @@ public class M6800CPUchar {
 	public IRAM ram;
 	public final int[] rom;
 	public int cycles;
-	private byte A;//Accumulator A use 16bit
-	private byte B;//Accumulator B use 16 bit
+	private int A;//Accumulator A use 16bit
+	private int B;//Accumulator B use 16 bit
 	
 	public int SP;//Stack Pointer 16 bit
 	public int PC;//Program Counter
@@ -37,13 +37,13 @@ public class M6800CPUchar {
 	public void setCycles(int cycles) {
 		this.cycles = cycles;
 	}
-	public byte getA() {
+	public int getA() {
 		return A;
 	}
 	public void setA(byte a) {
 		A = a;
 	}
-	public byte getB() {
+	public int getB() {
 		return B;
 	}
 	public void setB(byte b) {
@@ -1324,8 +1324,8 @@ public class M6800CPUchar {
 		    setflags( this.B);
 		    this.overflowFlag=0;
 		  }
-	 private void push(byte byteToPush) {
-		    ram.write(256 + (this.SP & 0xFF), (byte) byteToPush);
+	 private void push(int byteToPush) {
+		    ram.write(256 + (this.SP & 0xFF),  byteToPush);
 		    this.SP -= 1;
 		    this.SP &= 255;
 		  }
@@ -1681,7 +1681,7 @@ public class M6800CPUchar {
 		  conData[1] = (byte) (orginal >>> 8);//high 8
 		  return conData;
 	  }
-	  private short combinationByteToShort(byte high,byte low)
+	  private short combinationByteToShort(int high,int low)
 	  {
 		   short k=high;
 				//k=(short) (0x00ff&k);
@@ -1696,9 +1696,9 @@ public class M6800CPUchar {
 		    setflags(this.SP);
 		    this.overflowFlag=0;
 		    this.negativeFlag = getbit(this.SP, 15);*/
-		  byte[] conData = new byte[2];
-		  conData[0] = (byte) (this.SP);//low 8
-		  conData[1] = (byte) (this.SP >>> 8);//high 8
+		  int[] conData = new int[2];
+		  conData[0] = SP&0x00ff;//low 8
+		  conData[1] = (int) (SP &0xff00);//high 8
 		  
 		   if(addr==0)
 		   {
@@ -1719,10 +1719,10 @@ public class M6800CPUchar {
 		   else if(addr==2)
 		   {
 			   //address overflow?
-			   byte indirecttmp=ram.read(this.PC++);//get indirect data first.
-			   short storeaddressdata=(short) (this.SP+indirecttmp);
+			   int indirecttmp=ram.read(this.PC++);//get indirect data first.
+			   int storeaddressdata= this.SP+indirecttmp;
 			   indirecttmp=ram.read(this.PC++);
-			   short storeaddressdata2=(short) (this.SP+indirecttmp);
+			   int storeaddressdata2=this.SP+indirecttmp;
 			   ram.write(storeaddressdata, conData[1]);
 			   ram.write(storeaddressdata2, conData[0]);
 		   }

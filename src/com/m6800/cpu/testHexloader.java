@@ -36,15 +36,27 @@ public class testHexloader {
 			}
 			*/
 		//11101101
-		  double tmpa=1*Math.pow(2d, 7d)+1*Math.pow(2d, 6d)+1*Math.pow(2d, 5d)+0*Math.pow(2d, 4d)+1*Math.pow(2d, 3d)+1*Math.pow(2d, 2d)+0*Math.pow(2d, 1d)+1*1;
+		/*  double tmpa=1*Math.pow(2d, 7d)+1*Math.pow(2d, 6d)+1*Math.pow(2d, 5d)+0*Math.pow(2d, 4d)+1*Math.pow(2d, 3d)+1*Math.pow(2d, 2d)+0*Math.pow(2d, 1d)+1*1;
 		    System.out.println((int)tmpa);
 		    int kk=((int)tmpa);
 		    System.out.println(Byte.MAX_VALUE);
 		    System.out.println(Integer.MAX_VALUE);
 		    System.out.println();
-			System.out.println(Byte.valueOf((byte)tmpa));
+			System.out.println(Byte.valueOf((byte)tmpa));*/
+			  int[] conData = new int[2];
+			  int SP=0x8D9C;
+			  conData[0] =  SP&0x00ff;//low 8
+			  System.out.println(Integer.toHexString(conData[0]));
+			  conData[1] = (int) (SP &0xff00);//high 8
 			//System.out.println(getbit(s,8));
-			
+			  
+			  System.out.println(Integer.toHexString(conData[1]>>8));
+			  String tmp=Integer.toHexString(conData[1]>>8)+Integer.toHexString(conData[0]);
+			  int k=Integer.decode("0x"+tmp);
+			  String kb=Integer.toBinaryString(k);
+			  System.out.println(k);
+			  System.out.println(Integer.toHexString(Integer.decode("0x"+tmp)));
+			  System.out.println(kb);
 		/*} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
