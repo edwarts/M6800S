@@ -44,16 +44,30 @@ public class testHexloader {
 		    System.out.println();
 			System.out.println(Byte.valueOf((byte)tmpa));*/
 			  int[] conData = new int[2];
-			  int SP=0x8D9C;
+			  int SP=0x1D6A;
+			  //transfer one into two
 			  conData[0] =  SP&0x00ff;//low 8
 			  System.out.println(Integer.toHexString(conData[0]));
 			  conData[1] = (int) (SP &0xff00);//high 8
 			//System.out.println(getbit(s,8));
 			  
-			  System.out.println(Integer.toHexString(conData[1]>>8));
+			  //System.out.println(Integer.toHexString(conData[1]>>8));
+			  //combine two together.
 			  String tmp=Integer.toHexString(conData[1]>>8)+Integer.toHexString(conData[0]);
 			  int k=Integer.decode("0x"+tmp);
+			  //set the highest bit
+			  byte bitnum=(byte) (k>>1&0x01);
+			  //last bit]
+			  System.out.println("Last bit:"+(0x8d&01));
+			  System.out.println("Hex:"+Integer.toBinaryString(0x8d));
+              System.out.println(Integer.toBinaryString(0x8d).length());
+			  System.out.println("Last bit:"+(k&0x01));
+			  System.out.println("bit num:"+bitnum);
+			  //test the bitcount
+			  //System.out.println("Bit count:"+Integer.bitCount(k));
+			  //System.out.println(Integer.highestOneBit(k));
 			  String kb=Integer.toBinaryString(k);
+			  System.out.println(kb.length());
 			  System.out.println(k);
 			  System.out.println(Integer.toHexString(Integer.decode("0x"+tmp)));
 			  System.out.println(kb);

@@ -7,6 +7,7 @@ import javax.sound.midi.SysexMessage;
 
 
 import com.m6800.ram.IRAM;
+import com.sun.tools.jdi.ByteValueImpl;
 
 public class M6800CPUchar {
 	public Stack<Integer> pcstack=new Stack<Integer>();//stack for submarine program
@@ -1132,13 +1133,13 @@ public class M6800CPUchar {
 		this.zeroFlag=result==0?1:0;
 		if(this.overflowFlag==0)//not overflow
 		{
-			this.negativeFlag=getbit(result,1)==1?1:0;
+			this.negativeFlag=getFirstBit(result)==1?1:0;
 		}
 		else
 		{
 			this.negativeFlag=0;
 		}
-		this.A=(byte)result;
+		this.A=result;
 		imm();
 	}
 	/*
@@ -1220,7 +1221,7 @@ public class M6800CPUchar {
 	  {
 	    int result = regval - ram.read(addr);
 	    if (result < 0) {
-	      this.negativeFlag = getbit(result, 7);
+	      this.negativeFlag = getFirstBit(result);
 	      this.carryFlag = 0;
 	      this.zeroFlag = 0;
 	    } else if (result == 0) {
@@ -1228,7 +1229,7 @@ public class M6800CPUchar {
 	      this.carryFlag = 1;
 	      this.zeroFlag = 1;
 	    } else {
-	      this.negativeFlag = getbit(result, 7);
+	      this.negativeFlag = getFirstBit(result);
 	      this.carryFlag = 1;
 	      this.zeroFlag = 0;
 	    }
@@ -1553,10 +1554,10 @@ public class M6800CPUchar {
 		   {
 			   //address overflow?
 			   //address overflow?
-			   byte indirecttmp=ram.read(this.PC++);//get indirect data first.
-			   short storeaddressdata=(short) (this.X+indirecttmp);
+			   int indirecttmp=ram.read(this.PC++);//get indirect data first.
+			   int storeaddressdata=this.X+indirecttmp;
 			   indirecttmp=ram.read(this.PC++);
-			   short storeaddressdata2=(short) (this.X+indirecttmp);
+			   int storeaddressdata2=this.X+indirecttmp;
 			   ram.write(storeaddressdata, conData[1]);
 			   ram.write(storeaddressdata2, conData[0]);
 			   
@@ -1567,7 +1568,7 @@ public class M6800CPUchar {
 	  //1 for extended
 	  //2 for indirected
 	  private void ldx(int addr) {
-		  byte[] conData = new byte[2];
+		  int[] conData = new int[2];
 		  //conData[0] = ram.read();//high8;
 		  //conData[1] = (byte) (this.X >>> 8);//high 8
 		  
@@ -1591,8 +1592,8 @@ public class M6800CPUchar {
 				 conData[0]=ram.read(ram.read(this.PC++));
 				 //ram.write(ram.read(this.PC++),conData[0]);
 				 conData[1]=ram.read(ram.read(this.PC++));
-				 short address1=combinationByteToShort(conData[0],conData[1]);//in put of 
-				 short address2=(short) (address1+1);
+				 int address1=combinationByteToShort(conData[0],conData[1]);//in put of 
+				 int address2=address1+1;
 				 conData[0]=ram.read(address1);
 				 conData[0]=ram.read(address2); 
 			 
@@ -1600,21 +1601,18 @@ public class M6800CPUchar {
 		   else if(addr==2)
 		   {
 			   
-			   byte indirecttmp=ram.read(this.PC++);//get indirect data first.
-			   short storeaddressdata=(short) (this.X+indirecttmp);
+			   int indirecttmp=ram.read(this.PC++);//get indirect data first.
+			   int storeaddressdata=this.X+indirecttmp;
 			   indirecttmp=ram.read(this.PC++);
-			   short storeaddressdata2=(short) (this.X+indirecttmp);
+			   int storeaddressdata2=this.X+indirecttmp;
 			   
 			   conData[0]=ram.read(storeaddressdata);
 			   conData[1]=ram.read(storeaddressdata2);///////////
 			   
 		   }
-		   short k=conData[0];
+		   String k=Integer.toHexString(conData[1]>>8)+Integer.toHexString(conData[0]);
 			//k=(short) (0x00ff&k);
-			k=(short) (k<<8);
-
-			k=(short)(k+(conData[1]&0x00ff));
-		    this.X=k;
+		    this.X=Integer.decode("0x"+k);
 		    setflags(this.X);
 		    this.overflowFlag=0;
 		    this.negativeFlag = getbit(conData[0], 1);
@@ -1787,10 +1785,19 @@ public class M6800CPUchar {
 			  }
 	 
 	
-	 public static byte getbit(int num, int bitnum)
+	 public static byte getFirstBit(int num)
 	  {
-		return (byte)(num>>(8-bitnum)&0x01);
+		 String numbers=Integer.toBinaryString(num);
+		return 
 	  } 
+	 public static byte getFirstBit16(int num)
+	  {
+		return (byte)(num>>15&0x01);
+	  } 
+	 public static byte getLastBit(int num)
+	 {
+		 return (byte)(num&0x01);
+	 }
 	 
 	 public static byte test12(int data, int vaule)
 	  {
