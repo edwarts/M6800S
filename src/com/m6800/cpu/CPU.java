@@ -2253,7 +2253,8 @@ public class CPU implements Runnable {
 
        file = new File(getClass().getResource("/_emulator/resources/ROM/LOOKUPTABLE.S19").getFile());
        f.parse(file, this);*/
-       File file = new File(getClass().getResource("/_emulator/resources/ROM/ROM.HEX").getFile());
+       //File file = new File(getClass().getResource("/_emulator/resources/ROM/ROM.HEX").getFile());
+       File file = new File(getClass().getResource("chipos.txt").getFile());
        f.parseET(file, this);
 
        mem[0xCB00] = (byte)0xC0;
@@ -2273,7 +2274,7 @@ public class CPU implements Runnable {
      * @param state
      * @return state
      */
-    public testHarness.state test(testHarness.state in) {
+   /* public testHarness.state test(testHarness.state in) {
         int memLocation;
         int instruction;
         int lPC = 0xC;
@@ -2307,7 +2308,7 @@ public class CPU implements Runnable {
 
         return out;
     }//test
-
+*/
     /**
      * decode
      * Method to decode an instruction and call the correct method to
@@ -2858,7 +2859,7 @@ public class CPU implements Runnable {
         updated = true;
     }//decode
 
-    public void loadSettings() {
+   /* public void loadSettings() {
         File f1;
         File f2;
         File f3;
@@ -2902,7 +2903,7 @@ public class CPU implements Runnable {
 
             updated = true;
         }
-    }
+    }*/
 
     private void loadCustom(File f1, File f2, File f3) {
         fileParser f = new fileParser();

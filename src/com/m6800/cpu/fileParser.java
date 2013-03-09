@@ -1,5 +1,5 @@
 /*
- * COSC 3P92 Project
+w * COSC 3P92 Project
  * Motorola 6800 Emulator
  *
  * David Ketler 3394947, Frankie Lau 3844222
@@ -112,7 +112,7 @@ public class fileParser {
             }
             for(byte one:processor.mem)
             {
-            	System.out.println(one);
+            	System.out.println(Integer.toHexString(one));
             }
             System.out.println("ssss");
 
