@@ -105,14 +105,57 @@ public class fileParser {
                 if(line == null)
                     break;
 
-                for(int i = 0; i < line.length(); i = i + 2) {
+                for(int i = 9; i < line.length(); i = i + 2) {
+                	
                     processor.mem[address] = (byte)(parseHex(Character.toString((char)line.charAt(i)) + Character.toString((char)line.charAt(i+1)), 2) & 0x00FF);
+                    int memInt=processor.mem[address];
+                    System.out.println(Integer.toHexString(memInt));
                     address++;
                 }
             }
-            for(byte one:processor.mem)
+            for(int i=0xC000;i<0xC400;i++)
             {
-            	System.out.println(Integer.toHexString(one));
+            	System.out.println(Integer.toHexString(processor.mem[i]));
+            }
+            System.out.println("ssss");
+
+        }
+        catch(Exception e) {}
+    }//parseET
+    
+    //parse M6800
+
+    public void parseM6800(File f, CPU processor) {
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            FileReader in = new FileReader(f);
+            int linenumber=0;
+            String line;
+            int c;
+            int numBytes;//number of bytes in string
+            int address = 0xC000;
+            int eof;
+
+            while(true) {
+                line = br.readLine();
+                if(line == null)
+                    break;
+
+                for(int i = 9; i < line.length()-2; i = i + 2) {
+                	
+                    processor.mem[address] = (byte)(parseHex(Character.toString((char)line.charAt(i)) + Character.toString((char)line.charAt(i+1)), 2) & 0x00FF);
+                    int memInt=processor.mem[address];
+                    //System.out.println(Integer.toHexString(memInt));
+                    address++;
+                }
+               // System.out.println(line);
+                //System.out.println(linenumber++);
+            }
+            //System.out.println(Integer.toHexString(address));
+           for(int i=0xC000;i<0xC422;i++)
+            {
+        	    System.out.println(Integer.toHexString(i));
+            	System.out.println(Integer.toHexString(processor.mem[i]));
             }
             System.out.println("ssss");
 

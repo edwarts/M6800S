@@ -28,11 +28,11 @@ import java.awt.FileDialog;
 /**
  *
  * CPU class
- * Class representing the 6800 CPU
+ * Class representing the M6800 CPU
  * Performs the fetch/decode cycle and executes instructions from
  * the system's simulated memory
  *
- * @author David Ketler, 3394947
+ * @author Sili Hui
  */
 public class CPU implements Runnable {
     //Constants
@@ -85,7 +85,7 @@ public class CPU implements Runnable {
      */
     public void init() {
         //initialize registers to 0
-        PC = 0x0000;
+        PC = 0xC000;
         IX = 0x0000;
         SP = 0xD0;
         ACCA = (byte)0x00;
@@ -101,9 +101,39 @@ public class CPU implements Runnable {
             mem[i] = (byte)0x0;        }
 
         loadROM();
+        loadProgram();
     }
 
-    private void reset() {
+    private void loadProgram() {
+		// TODO Auto-generated method stub
+		mem[0x0200]=0x6A;
+		mem[0x0201]=0x00;
+		mem[0x0202]=0x6B;
+		mem[0x0203]=0x00;
+		mem[0x0204]=(byte) 0xA2;
+		mem[0x0205]=0x10;
+		mem[0x0206]=(byte) 0xDA;
+		mem[0x0207]=(byte) 0xB7;
+		mem[0x0208]=(byte) 0xDA;
+		mem[0x0209]=(byte) 0xB6;
+		mem[0x020A]=0x7A;
+		mem[0x020B]=0x01;
+		mem[0x020C]=0x7B;
+		mem[0x020D]=0x02;
+		mem[0x020E]=0x12;
+		mem[0x020F]=0x06;
+		mem[0x0210]=(byte) 0x82;
+		mem[0x0211]=0x44;
+		mem[0x0212]=0x28;
+		mem[0x0213]=0x10;
+		mem[0x0214]=0x28;
+		mem[0x0215]=0x44;
+		mem[0x0216]=(byte) 0x82;
+		mem[0x0217]=0x00;
+		
+	}
+
+	private void reset() {
         loadROM();
         CC = (byte)(CC | 0x10);
         PC = (mem[0xFFFE] << 8) | mem[0xFFFF];
@@ -123,9 +153,10 @@ public class CPU implements Runnable {
      */
     private void flyingSpaghettiMethod() {
         byte bitpattern;
+        int counter=0;
 
-        while(true) {
-
+        while(true&&counter!=49) {
+            counter++;
 
             /*if(!execute) {
                 while(true) {
@@ -141,7 +172,8 @@ public class CPU implements Runnable {
 
             //get next instruction
             bitpattern = mem[((int)PC & 0x0FFFF)];
-            PC = (PC + 1);
+            System.out.println(((int)PC & 0x0FFFF));
+           
 
             //allow toggling of stepthrough execution
            /* if(stepThroughExecution) {
@@ -159,20 +191,22 @@ public class CPU implements Runnable {
                 }
             }//if
 */
-            updated = true;
+            //updated = true;
 
-
+/*
             byte instH = (byte)((bitpattern >> 4) & 0x0F); //right shift to get only first nibble
             byte opcode = (byte)(bitpattern & 0x0F); //AND with 00001111 to get only opcode -- mmm bitmasking
 
-
-            updated = true;
+*/
+           // updated = true;
 
             //instructions with an upper nibble of < 0x3
             //IMPLIED ADDRESSING
 
             decode(bitpattern);
-            updated = true;
+            PC = (PC + 1);
+            //PC = (PC + 1);
+           // updated = true;
 
             //check for interrupt
             if(NMI) {
@@ -203,8 +237,11 @@ public class CPU implements Runnable {
 
     private int indexed() {             //DEBUG ME
 
-        int offset = mem[PC];
-        PC = (PC + 1);
+        //int offset = mem[PC]; orignial
+    	//
+    	int offset = mem[((int)PC & 0x0FFFF)];
+    	int k=((int)PC & 0x0FFFF);
+        PC = (k + 1);
         this.updated = true;
 
         byte result = (byte)((IX & 0x00FF) + offset);
@@ -2055,14 +2092,27 @@ public class CPU implements Runnable {
     private void bsr() {
         byte rel = mem[PC + 1];
 
-        PC = (byte)(PC + 2);
+        //PC = (byte)(PC + 2);
+        PC = PC + 2;
+        System.out.println(Integer.toHexString(PC));
+        try
+        {
         mem[SP] = (byte)(PC & 0x00FF);
         SP = (SP - 1);
+        
 
         mem[SP] = (byte)(((PC & 0xFF00) >> 8) & 0x00FF);
         SP = (SP - 1);
+        }
+        catch(Exception es)
+        {
+        	System.out.println("Error occurs in SP value: "+SP);
+        }
 
-        PC = (byte)(PC + rel);
+        //PC = (byte)(PC + rel);
+        //System.out.println(Integer.valueOf(Integer.toHexString((int)rel)));
+        PC = PC + rel;
+        System.out.println(Integer.toHexString(PC));
     }//bsr
 
     private void jsr(int addr) {
@@ -2185,6 +2235,7 @@ public class CPU implements Runnable {
         PC = (mem[SP] << 8);
         SP = SP + 1;
         PC = (PC | mem[SP]);
+        System.out.println("RTS:Return:from "+Integer.toHexString(PC));
     }//rts
 
     private void rti() {
@@ -2253,9 +2304,9 @@ public class CPU implements Runnable {
 
        file = new File(getClass().getResource("/_emulator/resources/ROM/LOOKUPTABLE.S19").getFile());
        f.parse(file, this);*/
-       //File file = new File(getClass().getResource("/_emulator/resources/ROM/ROM.HEX").getFile());
-       File file = new File(getClass().getResource("chipos.txt").getFile());
-       f.parseET(file, this);
+       File file = new File(getClass().getResource("/com/m6800/cpu/Dream6800Rom.hex").getFile());
+       //File file = new File(getClass().getResource("chipos.txt").getFile());
+       f.parseM6800(file, this);
 
        mem[0xCB00] = (byte)0xC0;
        mem[0xCB01] = (byte)0x00;
@@ -2318,12 +2369,15 @@ public class CPU implements Runnable {
      * @return void
      */
     private void decode(int bitpattern) {
-    	System.out.println(bitpattern);
+    	
         byte instH = (byte)((bitpattern >> 4) & 0x0F); //right shift to get only first nibble
         byte opcode = (byte)(bitpattern & 0x0F); //AND with 00001111 to get only opcode -- mmm bitmasking
         updated = true;
-        System.out.println(Integer.toHexString(bitpattern));
-
+        System.out.println(Integer.toHexString(PC)+"->"+Integer.toHexString(instH)+" "+Integer.toHexString(opcode));
+        if(PC==0x0216)
+        {
+        	 System.out.println(Integer.toHexString(PC)+" 0216->"+Integer.toHexString(instH)+" "+Integer.toHexString(opcode));
+        }
         if (instH < 0x03) {
             switch (bitpattern) {
                 case 0x01:
