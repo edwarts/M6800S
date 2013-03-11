@@ -205,6 +205,7 @@ public class CPU implements Runnable {
 
             decode(bitpattern);
             PC = (PC + 1);
+            //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;
 
