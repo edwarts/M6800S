@@ -1,9 +1,11 @@
-package com.m6800.ui;
+package com.m6800.test;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.*;
+
+import com.m6800.ui.KeyPad;
 
 public class Renderer extends JFrame implements KeyListener{
 

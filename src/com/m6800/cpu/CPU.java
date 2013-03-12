@@ -38,7 +38,7 @@ public class CPU implements Runnable {
     //Constants
     static int MEMORYPOOL = 65536;
 
-    public byte mem[]; //memory array
+    public static byte mem[]; //memory array
     public int PC;
     public int IX;
     public int SP;
@@ -57,9 +57,10 @@ public class CPU implements Runnable {
     public boolean reset;
 
     int zero;
+    private static CPU _m_cpu;
 
     public static void main(String args[]) {
-        new Thread(new CPU()).start();
+        new Thread(CPU.getInstance()).start();
     }
 
     public void run() {
@@ -74,7 +75,19 @@ public class CPU implements Runnable {
         System.out.println("Finish computing");
     }
 
-    public CPU() {
+    private CPU() {
+    }
+    public static CPU getInstance()
+    {
+    	if(_m_cpu==null)
+    	{
+    		_m_cpu=new CPU();
+    		return _m_cpu;
+    	}
+    	else
+    	{
+    		return _m_cpu;
+    	}
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.m6800.ui;
+package com.m6800.test;
 
 import java.util.Random;
 import java.io.IOException;
