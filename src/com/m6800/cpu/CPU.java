@@ -146,7 +146,7 @@ public class CPU implements Runnable {
 		
 	}
 
-	private void reset() {
+	public void reset() {
         loadROM();
         CC = (byte)(CC | 0x10);
         PC = (mem[0xFFFE] << 8) | mem[0xFFFF];

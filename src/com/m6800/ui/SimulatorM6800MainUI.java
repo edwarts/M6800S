@@ -16,7 +16,7 @@ import java.sql.*;
  * @author Matthieu SIMON
  * @version 0.2 du 29/06/05
  */
-public class Simulator8051 extends JFrame implements Runnable {
+public class SimulatorM6800MainUI extends JFrame implements Runnable {
 	public final static double VERSION     = 0.2;	
 	public final static String FRAME_TITLE = "8051 Simulator v" + VERSION;
 	public final static String SPLASH_PIC  = "docs/microprocessor.png";
@@ -24,7 +24,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 	public final static String HELP_URL    = "docs/help.html";
 	
 	private CPU     cpu;
-	private CORE_AsmParser   parser;
+	//private CORE_AsmParser   parser;
 	private ArrayList   sourceList;
  	
 	private JMenuItem   openBut;
@@ -63,7 +63,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 	/**
 	 * Crée l'objet.
 	 */
-	public Simulator8051() {		
+	public SimulatorM6800MainUI() {		
 		super(FRAME_TITLE);
 		sourceCodeDlg = new GUI_SourceCodeDialog(this);
 		sfrDlg        = new GUI_SFRDialog(this);
@@ -72,7 +72,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 		//uartDlg       = new GUI_UART();
 		seg7DlgList   = new ArrayList(0);
 		createMasterFrame();
-		updateConsole("8051 Simulator started.");
+		updateConsole("M6800 Simulator started.");
 	}	
 	
 	/**
@@ -103,16 +103,16 @@ public class Simulator8051 extends JFrame implements Runnable {
 		}
 		
 		if(!file.equals("")) {		
-			parser = new CORE_AsmParser();
+			//parser = new CORE_AsmParser();
 			try {
-				parser.openAsmFile(file);
+				//parser.openAsmFile(file);
 			}
 			catch(IOException e) {
 				updateConsole("** Error reading the source file. **");
 				return;
 			}	
 			sourceList = new ArrayList(0);
-			CORE_AsmLine asmline;
+			/*                                                                                                                                                                                                          //CORE_AsmLine asmline;
 			try {
 				while((asmline = parser.getAsmLine()) != null) {			
 					sourceList.ensureCapacity(sourceList.size()+1);
@@ -123,7 +123,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 			catch(IOException e) {
 				updateConsole("** Error reading the source file. **");
 				return;
-			}
+			}*/
 			try {
 				cpu = new CORE_CPU8051(sourceList);
 			}
@@ -265,7 +265,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 			else if(item.equals(intMemWinBut))
 				dataMemDlg.setVisible(!dataMemDlg.isVisible());
 			else if(item.equals(ioWinBut))
-				ioPortsDlg.setVisible(!ioPortsDlg.isVisible());
+			{}
 			else if(cpu == null || item.equals(openBut))
 				openAsmFile("");
 			else if(item.equals(reloadBut)) {
@@ -277,7 +277,7 @@ public class Simulator8051 extends JFrame implements Runnable {
 				threadRun = false;
 				needReset = false;
 				timer.stop();
-				cpu.initCPU();
+				cpu.reset();
 				updateGUI();				
 			}
 			else if(item.equals(stepBut) && !needReset && !threadRun) { 
@@ -326,13 +326,13 @@ public class Simulator8051 extends JFrame implements Runnable {
 	 */
 	private void scheduleCPU() {
 		try {			
-			cpu.scheduleCPU();		
+			//cpu.scheduleCPU();// set the running and computing of the CPU		
 		}
-		catch(CPU8051Exception e) {
+		catch(Exception e) {
 			threadRun = false;
 			needReset = true;
 			timer.stop();
-			cpu.setPC(cpu.getPC()-1);
+			cpu.PC=(cpu.PC-1);
 			updateGUI();
 			updateConsole(e.toString());
 		}
@@ -376,6 +376,6 @@ public class Simulator8051 extends JFrame implements Runnable {
 			}
 		}).start();
 		Thread.sleep(1000);
-		new Simulator8051();
+		new SimulatorM6800MainUI();
 	}
 }
