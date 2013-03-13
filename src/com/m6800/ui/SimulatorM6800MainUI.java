@@ -80,7 +80,7 @@ public class SimulatorM6800MainUI extends JFrame implements Runnable {
 	 */
 	private void updateGUI() {
 		sfrDlg.readSFRTableFromCPU();
-		sourceCodeDlg.updateRowSelection(cpu.getPC());
+		sourceCodeDlg.updateRowSelection(cpu.PC);
 		sourceCodeDlg.getCyclesLabel().setText("Cycles count : " + cpu.getCyclesCount());
 		dataMemDlg.fillDataMemory();
 		//ioPortsDlg.fillIOPorts();		
@@ -349,7 +349,7 @@ public class SimulatorM6800MainUI extends JFrame implements Runnable {
 	public void run() {
 		while(threadRun) {
 			scheduleCPU();			
-			if(CORE_CPU8051.sourceCode[cpu.getPC()] != null && CORE_CPU8051.sourceCode[cpu.getPC()].getBreakPoint())
+			if(CORE_CPU8051.sourceCode[cpu.PC()] != null && CORE_CPU8051.sourceCode[cpu.getPC()].getBreakPoint())
 				BreakRun();
 			
 			synchronized(seg7DlgList) {
