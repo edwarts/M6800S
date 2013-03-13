@@ -53,7 +53,7 @@ public class CPU implements Runnable {
     public boolean NMI;
     public boolean MI;
     public int irq = 0xFF90;
-
+    public static int offset=1;
     public boolean reset;
 
     int zero;
@@ -215,9 +215,10 @@ public class CPU implements Runnable {
 
             //instructions with an upper nibble of < 0x3
             //IMPLIED ADDRESSING
-
+            PC = (PC + offset);
+            offset=1;
             decode(bitpattern);
-            PC = (PC + 1);
+           
             //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;
@@ -578,7 +579,7 @@ public class CPU implements Runnable {
 
         //branch if not equal (Z is 0)
         if(((CC & 0x04)) == 0)
-            PC = ((int)(PC & 0x0FFFF) + offset)+1;
+           offset=offset;// PC = ((int)(PC & 0x0FFFF) + offset)+1;
         System.out.println(Integer.toHexString(PC)+" Offset"+Integer.toHexString(offset));
     }
     private void beq() {
@@ -2337,7 +2338,7 @@ public class CPU implements Runnable {
 
        file = new File(getClass().getResource("/_emulator/resources/ROM/LOOKUPTABLE.S19").getFile());
        f.parse(file, this);*/
-       File file = new File("D:/Java coursework/dv3/Dream6800Rom.hex");
+       File file = new File("Dream6800Rom.hex");
        //File file = new File(getClass().getResource("chipos.txt").getFile());
        f.parseM6800(file, this);
 
