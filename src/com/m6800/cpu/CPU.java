@@ -128,7 +128,7 @@ public class CPU implements Runnable {
 		mem[0x0206]=(byte) 0xDA;
 		mem[0x0207]=(byte) 0xB7;
 		mem[0x0208]=(byte) 0xDA;
-		mem[0x0209]=(byte) 0xB6;
+		mem[0x0209]=(byte) 0xB7;
 		mem[0x020A]=0x7A;
 		mem[0x020B]=0x01;
 		mem[0x020C]=0x7B;
@@ -146,7 +146,7 @@ public class CPU implements Runnable {
 		
 	}
 
-	public void reset() {
+	private void reset() {
         loadROM();
         CC = (byte)(CC | 0x10);
         PC = (mem[0xFFFE] << 8) | mem[0xFFFF];
@@ -168,7 +168,7 @@ public class CPU implements Runnable {
         byte bitpattern;
         int counter=0;
 
-        while(true&&counter!=49) {
+        while(true&&counter!=2000) {
             counter++;
 
             /*if(!execute) {
@@ -253,7 +253,8 @@ public class CPU implements Runnable {
 
         //int offset = mem[PC]; orignial
     	//
-    	int offset = mem[((int)PC & 0x0FFFF)];
+    	//PC=PC+1; c07f-c080
+    	int offset = mem[((int)(PC+1) & 0x0FFFF)];//
     	int k=((int)PC & 0x0FFFF);
         PC = (k + 1);
         this.updated = true;
@@ -270,7 +271,7 @@ public class CPU implements Runnable {
     }
 
     private int extended() {
-
+    	PC=PC+1;//+1
         byte higher = mem[(int)PC & 0x0FFFF];
         PC = (PC + 1);
         byte lower = mem[(int)PC & 0x0FFFF];
@@ -284,19 +285,19 @@ public class CPU implements Runnable {
 
     private int immediate() {
         PC = (PC + 1);
-        int addr = (PC - 1) & 0x0FFFF;
+        int addr = (PC - 1+1) & 0x0FFFF;
         return addr;
     }
 
     private int immediateLD() {
         PC = (PC + 2);
-        int addr = (PC - 2) & 0x0FFFF;
+        int addr = (PC - 2+1) & 0x0FFFF;
         return addr;
     }
 
     private int direct() {
         PC = (PC + 1);
-        int addr = mem[(int)(PC - 1) & 0x0FFFF] & 0x00FF;
+        int addr = mem[(int)(PC - 1+1) & 0x0FFFF] & 0x00FF;
         return addr;
     }
 
@@ -525,7 +526,8 @@ public class CPU implements Runnable {
         ACCA = (byte)result;
     }
     private void bra() {
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];//bra +1
+        System.out.println("Bra Offset"+offset);
         PC = ((int)(PC & 0x0FFFF) + 1);
 
         PC = ((int)(PC & 0x0FFFF) + offset);
@@ -551,13 +553,13 @@ public class CPU implements Runnable {
             PC = ((int)(PC & 0x0FFFF)  + offset);
     }
     private void bcc() {
-
-        byte offset = mem[(int)PC & 0x0FFFF];
+        
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];//+1
         PC = ((int)(PC & 0x0FFFF) + 1);
 
         //branch if C is clear
         if(((CC & 0x01)) == 0)
-            PC = ((int)(PC & 0x0FFFF) + offset);
+            PC = ((int)(PC & 0x0FFFF) + offset);// PC = ((int)(PC & 0x0FFFF) + offset+1);
     }
     private void bcs() {
 
@@ -569,13 +571,15 @@ public class CPU implements Runnable {
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bne() {
-
-        byte offset = mem[(int)PC & 0x0FFFF];
-        PC = ((int)(PC & 0x0FFFF) + 1);
+        
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
+        PC = ((int)(PC & 0x0FFFF)+1 );//PC = ((int)(PC & 0x0FFFF) + 1-1); c085~c086
+        System.out.println(Integer.toHexString(PC)+" Offset"+Integer.toHexString(offset));
 
         //branch if not equal (Z is 0)
         if(((CC & 0x04)) == 0)
-            PC = ((int)(PC & 0x0FFFF) + offset);
+            PC = ((int)(PC & 0x0FFFF) + offset)+1;
+        System.out.println(Integer.toHexString(PC)+" Offset"+Integer.toHexString(offset));
     }
     private void beq() {
 
@@ -2104,10 +2108,22 @@ public class CPU implements Runnable {
     }//cpx
 
     private void bsr() {
-        byte rel = mem[PC + 1];
+    	byte rel=0;
+    	try
+    	{
+    	System.out.println("before eception"+Integer.toHexString(PC));
+    	
+        rel = mem[PC + 1];
+    	}
+    	catch(Exception es)
+    	{
+    		System.out.println("After eception"+Integer.toHexString(PC));
+    		
+    		System.out.println("After eception pc+1"+Integer.toHexString(PC+1));
+    	}
 
         //PC = (byte)(PC + 2);
-        PC = PC + 2;
+        PC = (int)PC + 1;//c002-c003 2-1 int
         System.out.println(Integer.toHexString(PC));
         try
         {
@@ -2125,19 +2141,21 @@ public class CPU implements Runnable {
 
         //PC = (byte)(PC + rel);
         //System.out.println(Integer.valueOf(Integer.toHexString((int)rel)));
-        PC = PC + rel;
+        
+        PC = PC + rel;// int 
         System.out.println(Integer.toHexString(PC));
     }//bsr
 
     private void jsr(int addr) {
 
-        mem[SP] = (byte)(PC & 0x00FF);
+        mem[SP] = (byte)((PC & 0x00FF)-1);//-1 jsr
+        System.out.println("byte"+Integer.toHexString(mem[SP]));
         SP = (SP - 1);
 
         mem[SP] = (byte)(((PC & 0xFF00) >> 8) & 0x00FF);
         SP = (SP - 1);
 
-        PC = addr;
+        PC = addr-1;//PC = addr;
     }//jsr
 
     private void lds(int addr) {
@@ -2186,6 +2204,7 @@ public class CPU implements Runnable {
 
         IX = ((high << 8) & 0xFF00);
         IX = IX | (low & 0x00FF);
+        System.out.println(Integer.toHexString(IX));
 
     }//ldx
 
@@ -2318,7 +2337,7 @@ public class CPU implements Runnable {
 
        file = new File(getClass().getResource("/_emulator/resources/ROM/LOOKUPTABLE.S19").getFile());
        f.parse(file, this);*/
-       File file = new File(getClass().getResource("/com/m6800/cpu/Dream6800Rom.hex").getFile());
+       File file = new File("D:/Java coursework/dv3/Dream6800Rom.hex");
        //File file = new File(getClass().getResource("chipos.txt").getFile());
        f.parseM6800(file, this);
 
@@ -2387,6 +2406,7 @@ public class CPU implements Runnable {
         byte instH = (byte)((bitpattern >> 4) & 0x0F); //right shift to get only first nibble
         byte opcode = (byte)(bitpattern & 0x0F); //AND with 00001111 to get only opcode -- mmm bitmasking
         updated = true;
+        System.out.println("opcode"+Integer.toHexString(opcode));
         System.out.println(Integer.toHexString(PC)+"->"+Integer.toHexString(instH)+" "+Integer.toHexString(opcode));
         if(PC==0x0216)
         {
@@ -2654,6 +2674,7 @@ public class CPU implements Runnable {
                         clr('m', indexed());
                     } else if (instH == 0x7) {
                         clr('m', extended());
+                        PC=PC-1;//c221
                     }
                     break;
             }//switch
@@ -2884,6 +2905,8 @@ public class CPU implements Runnable {
                     } else if (instH == 0x9); //halt & catch fire
                     else if (instH == 0xA) {
                         jsr(indexed());
+                        mem[SP+2] = (byte) (mem[SP+2]+1);//c03c AD index modification
+                        
                     } else if (instH == 0xB) {
                         jsr(extended());
                     }
