@@ -53,7 +53,7 @@ public class CPU implements Runnable {
     public boolean NMI;
     public boolean MI;
     public int irq = 0xFF90;
-    public static int offset=1;
+
     public boolean reset;
 
     int zero;
@@ -168,7 +168,7 @@ public class CPU implements Runnable {
         byte bitpattern;
         int counter=0;
 
-        while(true&&counter!=2000) {
+        while(true&&counter!=3000) {
             counter++;
 
             /*if(!execute) {
@@ -215,10 +215,9 @@ public class CPU implements Runnable {
 
             //instructions with an upper nibble of < 0x3
             //IMPLIED ADDRESSING
-            PC = (PC + offset);
-            offset=1;
+
             decode(bitpattern);
-           
+            PC = (PC + 1);
             //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;
@@ -272,11 +271,11 @@ public class CPU implements Runnable {
     }
 
     private int extended() {
-    	PC=PC+1;//+1
-        byte higher = mem[(int)PC & 0x0FFFF];
-        PC = (PC + 1);
+    	PC=PC+2;//+1
+        byte higher = mem[(int)(PC-1) & 0x0FFFF];
+        
         byte lower = mem[(int)PC & 0x0FFFF];
-        PC = (PC + 1);
+       
 
         int address = ((higher << 8) & 0xFF00);
         address = address | (lower & 0x00FF);
@@ -557,7 +556,7 @@ public class CPU implements Runnable {
         
         byte offset = mem[(int)(PC+1) & 0x0FFFF];//+1
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        System.out.println(ACCA);
         //branch if C is clear
         if(((CC & 0x01)) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);// PC = ((int)(PC & 0x0FFFF) + offset+1);
@@ -579,12 +578,12 @@ public class CPU implements Runnable {
 
         //branch if not equal (Z is 0)
         if(((CC & 0x04)) == 0)
-           offset=offset;// PC = ((int)(PC & 0x0FFFF) + offset)+1;
+            PC = ((int)(PC & 0x0FFFF) + offset);
         System.out.println(Integer.toHexString(PC)+" Offset"+Integer.toHexString(offset));
     }
     private void beq() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
 
         //branch if not equal (Z is 1)
@@ -610,9 +609,11 @@ public class CPU implements Runnable {
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bpl() {
-
+    	 PC = ((int)(PC & 0x0FFFF) + 1);
         byte offset = mem[(int)PC & 0x0FFFF];
-        PC = ((int)(PC & 0x0FFFF) + 1);
+        System.out.println(offset);
+        System.out.println(Integer.toHexString(ACCA));
+       // PC = ((int)(PC & 0x0FFFF) + 1);
 
         //branch if plus (N is 0)
         if(((CC & 0x08)) == 0)
@@ -677,6 +678,7 @@ public class CPU implements Runnable {
         else if(loc == 'b') {
             SP = (SP + 1);
             ACCB = mem[SP]; }
+        System.out.println(ACCB);
     }
     private void des() {
         SP = (SP - 1);
@@ -1819,6 +1821,7 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC & 0xFD);
+            System.out.println("A---"+Integer.toHexString(ACCA));
         }
         else if(loc == 'b') {
             mem[addr] = ACCB;
@@ -2110,11 +2113,13 @@ public class CPU implements Runnable {
 
     private void bsr() {
     	byte rel=0;
+    	PC=(int)((PC & 0x0FFFF)+1);
+    	rel = mem[PC];
     	try
     	{
     	System.out.println("before eception"+Integer.toHexString(PC));
     	
-        rel = mem[PC + 1];
+       
     	}
     	catch(Exception es)
     	{
@@ -2124,11 +2129,11 @@ public class CPU implements Runnable {
     	}
 
         //PC = (byte)(PC + 2);
-        PC = (int)PC + 1;//c002-c003 2-1 int
+        PC = (int)PC ;//c002-c003 2-1 int
         System.out.println(Integer.toHexString(PC));
         try
         {
-        mem[SP] = (byte)(PC & 0x00FF);
+        mem[SP] = (byte)((PC) & 0x00FF);
         SP = (SP - 1);
         
 
@@ -2149,7 +2154,7 @@ public class CPU implements Runnable {
 
     private void jsr(int addr) {
 
-        mem[SP] = (byte)((PC & 0x00FF)-1);//-1 jsr
+        mem[SP] = (byte)((PC & 0x00FF));//-1 jsr
         System.out.println("byte"+Integer.toHexString(mem[SP]));
         SP = (SP - 1);
 
@@ -2407,7 +2412,7 @@ public class CPU implements Runnable {
         byte instH = (byte)((bitpattern >> 4) & 0x0F); //right shift to get only first nibble
         byte opcode = (byte)(bitpattern & 0x0F); //AND with 00001111 to get only opcode -- mmm bitmasking
         updated = true;
-        System.out.println("opcode"+Integer.toHexString(opcode));
+        System.out.println("fetch----"+Integer.toHexString(PC));
         System.out.println(Integer.toHexString(PC)+"->"+Integer.toHexString(instH)+" "+Integer.toHexString(opcode));
         if(PC==0x0216)
         {
@@ -2675,7 +2680,7 @@ public class CPU implements Runnable {
                         clr('m', indexed());
                     } else if (instH == 0x7) {
                         clr('m', extended());
-                        PC=PC-1;//c221
+                        
                     }
                     break;
             }//switch
@@ -2906,7 +2911,7 @@ public class CPU implements Runnable {
                     } else if (instH == 0x9); //halt & catch fire
                     else if (instH == 0xA) {
                         jsr(indexed());
-                        mem[SP+2] = (byte) (mem[SP+2]+1);//c03c AD index modification
+                        
                         
                     } else if (instH == 0xB) {
                         jsr(extended());
