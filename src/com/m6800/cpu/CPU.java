@@ -215,6 +215,7 @@ public class CPU implements Runnable {
 
             //instructions with an upper nibble of < 0x3
             //IMPLIED ADDRESSING
+<<<<<<< HEAD
 
             decode(bitpattern);
             PC = (PC + 1);
@@ -224,6 +225,13 @@ public class CPU implements Runnable {
             PC = (PC + offset);
             offset=1;
 >>>>>>> mmm*/
+=======
+ 
+            decode(bitpattern);
+            PC = (PC + 1);
+
+          
+>>>>>>> sss
             //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;
