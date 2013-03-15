@@ -146,7 +146,7 @@ public class CPU implements Runnable {
 		
 	}
 
-	private void reset() {
+	public void reset() {
         loadROM();
         CC = (byte)(CC | 0x10);
         PC = (mem[0xFFFE] << 8) | mem[0xFFFF];
@@ -215,16 +215,15 @@ public class CPU implements Runnable {
 
             //instructions with an upper nibble of < 0x3
             //IMPLIED ADDRESSING
-<<<<<<< HEAD
 
             decode(bitpattern);
             PC = (PC + 1);
-=======
+/*=======
           
             decode(bitpattern);
             PC = (PC + offset);
             offset=1;
->>>>>>> mmm
+>>>>>>> mmm*/
             //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;

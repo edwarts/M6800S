@@ -72,7 +72,7 @@ public class GUI_SourceCodeDialog extends JDialog {
 		sourceCodeTable.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyCode() == KeyEvent.VK_B) {
-					setBreakpoint();
+					//setBreakpoint();
 				}
 			}
 		});
@@ -82,7 +82,7 @@ public class GUI_SourceCodeDialog extends JDialog {
 		brkBut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0));
 		brkBut.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setBreakpoint();
+				//setBreakpoint();
 			}
 		});
 	    popup.add(brkBut);
@@ -91,7 +91,7 @@ public class GUI_SourceCodeDialog extends JDialog {
 	    sourceCodeTable.addMouseListener(popupListener);
 	}
 	
-	public void setBreakpoint() {
+/*	public void setBreakpoint() {
 		String s = null;
 		try {
 			s = (String)sourceCodeTable.getValueAt(sourceCodeTable.getSelectedRow(), 0);
@@ -105,7 +105,7 @@ public class GUI_SourceCodeDialog extends JDialog {
 			CORE_AsmLine line = CORE_CPU8051.sourceCode[Integer.parseInt(((String)s), 16)];
 			if(line != null)
 				line.setBreakPoint(!line.getBreakPoint());
-		}	
+		}	*/
 	}
 	
 	public void updateRowSelection(int pc) {

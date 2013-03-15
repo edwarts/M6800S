@@ -17,8 +17,8 @@ import java.sql.*;
  * @version 0.2 du 29/06/05
  */
 public class SimulatorM6800MainUI extends JFrame implements Runnable {
-	public final static double VERSION     = 0.2;	
-	public final static String FRAME_TITLE = "8051 Simulator v" + VERSION;
+	public final static double VERSION     = 1.0;	
+	public final static String FRAME_TITLE = "M6800 EMULATOR" + VERSION;
 	public final static String SPLASH_PIC  = "docs/microprocessor.png";
 	public final static String ICON        = "docs/icon.gif";
 	public final static String HELP_URL    = "docs/help.html";
@@ -125,7 +125,7 @@ public class SimulatorM6800MainUI extends JFrame implements Runnable {
 				return;
 			}*/
 			try {
-				cpu = new CORE_CPU8051(sourceList);
+				cpu = CPU.getInstance();
 			}
 			catch(CPU8051Exception ex) {
 				updateConsole(ex.toString());
