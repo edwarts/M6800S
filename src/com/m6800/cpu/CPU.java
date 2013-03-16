@@ -53,6 +53,8 @@ public class CPU implements Runnable {
     public boolean NMI;
     public boolean MI;
     public int irq = 0xFF90;
+    public int cycles=0;
+    public int Totalcycle=0;
 
     public boolean reset;
 
@@ -72,7 +74,8 @@ public class CPU implements Runnable {
         execute = false;
         System.out.println("Start to compute");
         flyingSpaghettiMethod();
-        System.out.println("Finish computing");
+        System.out.println("Finish computing"+"  TotoalCycles"+Totalcycle);
+        for(int i=0x0100;i<0x0200;i++){System.out.println(Integer.toHexString(i)+":"+Integer.toHexString(mem[i]));}
     }
 
     private CPU() {
@@ -168,7 +171,7 @@ public class CPU implements Runnable {
         byte bitpattern;
         int counter=0;
 
-        while(true&&counter!=3000) {
+        while(true&&counter!=10) {
             counter++;
 
             /*if(!execute) {
@@ -218,12 +221,6 @@ public class CPU implements Runnable {
 
             decode(bitpattern);
             PC = (PC + 1);
-/*=======
-          
-            decode(bitpattern);
-            PC = (PC + offset);
-            offset=1;
->>>>>>> mmm*/
             //ahsahsAHSHA
             //PC = (PC + 1);
            // updated = true;
@@ -273,6 +270,8 @@ public class CPU implements Runnable {
 
         int address = IX;
         address = address | (result & 0x00FF);
+        cycles=5;
+        Totalcycle+=5;
         return address;
     }
 
@@ -285,25 +284,32 @@ public class CPU implements Runnable {
 
         int address = ((higher << 8) & 0xFF00);
         address = address | (lower & 0x00FF);
-
+        cycles=4;
+        Totalcycle+=4;
         return address;
     }
 
     private int immediate() {
         PC = (PC + 1);
         int addr = (PC - 1+1) & 0x0FFFF;
+        cycles=2;
+        Totalcycle+=2;
         return addr;
     }
 
     private int immediateLD() {
         PC = (PC + 2);
         int addr = (PC - 2+1) & 0x0FFFF;
+        cycles=3;
+        Totalcycle+=3;
         return addr;
     }
 
     private int direct() {
         PC = (PC + 1);
         int addr = mem[(int)(PC - 1+1) & 0x0FFFF] & 0x00FF;
+        cycles=3;
+        Totalcycle+=3;
         return addr;
     }
 
@@ -312,22 +318,29 @@ public class CPU implements Runnable {
             Thread.sleep(200);
         }
         catch(Exception e) {}
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void tap() {
         CC = (byte)(CC | (ACCA & 0x003F)); //isolate the bits we want
 
         updated = true;
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void tpa() {
-        clr('a');
+        clr('a');//timing include in method clr
         ACCA = (byte)((CC & 0x1F));
+      
     }
 
     private void clr(char accum) {
         if(accum == 'a')  ACCA = (byte)0;
         else if(accum == 'b') ACCB = (byte)0;
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void inx() {
@@ -338,6 +351,8 @@ public class CPU implements Runnable {
             CC = (byte)(CC | 0x04);
         else
             CC = (byte)(CC & 0xFB);
+        cycles=4;
+        Totalcycle+=4;
     }
 
     private void dex() {
@@ -346,29 +361,44 @@ public class CPU implements Runnable {
             CC = (byte)(CC | 0x04);
         else
             CC = (byte)(CC & 0xFB);
+        
+        cycles=4;
+        Totalcycle+=4;
     }
 
     private void clv() { //check
         CC = (byte)(CC & 0xFD);
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void sev() {
         CC = (byte)(CC | 0x02);
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void clc() {
         CC = (byte)(CC & 0xFE);
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void sec() {
         CC = (byte)(CC | 0x01);
+        cycles=2;
+        Totalcycle+=2;
     }
 
     private void cli() {
         CC = (byte)(CC & 0xEF);
+        cycles=2;
+        Totalcycle+=2;
     }
     private void sei() {
         CC = (byte)(CC | 0x10);
+        cycles=2;
+        Totalcycle+=2;
     }
     private void sba() {
         int result = (byte)(ACCA - ACCB);
@@ -394,6 +424,8 @@ public class CPU implements Runnable {
                 | (result & 0x80) & ~(ACCA & 0x80)) >> 7);
 
         ACCA = (byte)result;
+        cycles=2;
+        Totalcycle+=2;
     }
     private void cba() {
         int result = ACCA - ACCB;
@@ -416,6 +448,8 @@ public class CPU implements Runnable {
         CC = (byte)(CC | ((((~(ACCA & 0x80) & (ACCB & 0x80))
                 + ((ACCB & 0x80) & (result & 0x80))
                 + (result & 0x80) & ~(ACCA & 0x80)) >> 7)));
+        cycles=2;
+        Totalcycle+=2;
     }
     private void tab() {
         ACCB = ACCA;
@@ -434,6 +468,8 @@ public class CPU implements Runnable {
 
         //set V
         CC = (byte)(CC & 0xFD);
+        cycles=2;
+        Totalcycle+=2;
     }
     private void tba() {
         ACCA = ACCB;
@@ -452,6 +488,8 @@ public class CPU implements Runnable {
 
         //set V
         CC = (byte)(CC & 0xFD);
+        cycles=2;
+        Totalcycle+=2;
     }
     private void daa() {
         int result;
@@ -485,7 +523,7 @@ public class CPU implements Runnable {
                 ACCA = (byte)(ACCA + 0x66);
             }
             CC = (byte)(CC | 0x01);
-        }
+                }
 
         //set other flags
         //set N
@@ -499,6 +537,9 @@ public class CPU implements Runnable {
             CC = (byte)(CC | 0x04);
         else
             CC = (byte)(CC & 0xFB);
+        
+        cycles=2;
+        Totalcycle+=2;
     }//daa
 
     private void aba() {
@@ -530,6 +571,8 @@ public class CPU implements Runnable {
                 + (~(result & 0x80) & (ACCA & 0x80)) >> 7));
 
         ACCA = (byte)result;
+        cycles=2;
+        Totalcycle+=2;//index add default cycle 5. special 7 add 7-5=2()
     }
     private void bra() {
         byte offset = mem[(int)(PC+1) & 0x0FFFF];//bra +1
@@ -539,11 +582,14 @@ public class CPU implements Runnable {
         PC = ((int)(PC & 0x0FFFF) + offset);
 
         this.updated = true;
+        cycles=4;
+        Totalcycle+=4;
     }
     private void bhi() {
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //if Z and C CC are clear, branch
         if((((CC & 0x01) << 3) & (CC & 0x04)) == 0)
             PC = ((int)(PC & 0x0FFFF)  + offset);
@@ -551,9 +597,10 @@ public class CPU implements Runnable {
     }
     private void bls() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch of c is set OR z is set
         if(((CC & 0x01) | (CC & 0x04)) != 0)
             PC = ((int)(PC & 0x0FFFF)  + offset);
@@ -563,15 +610,19 @@ public class CPU implements Runnable {
         byte offset = mem[(int)(PC+1) & 0x0FFFF];//+1
         PC = ((int)(PC & 0x0FFFF) + 1);
         System.out.println(ACCA);
+        cycles=4;
+        Totalcycle+=4;
         //branch if C is clear
         if(((CC & 0x01)) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);// PC = ((int)(PC & 0x0FFFF) + offset+1);
+       
     }
     private void bcs() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if C is set
         if(((CC & 0x01)) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
@@ -581,7 +632,8 @@ public class CPU implements Runnable {
         byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF)+1 );//PC = ((int)(PC & 0x0FFFF) + 1-1); c085~c086
         System.out.println(Integer.toHexString(PC)+" Offset"+Integer.toHexString(offset));
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if not equal (Z is 0)
         if(((CC & 0x04)) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
@@ -591,32 +643,38 @@ public class CPU implements Runnable {
 
         byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if not equal (Z is 1)
         if(((CC & 0x04)) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bvc() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if overflow clear (V is 0)
         if(((CC & 0x02)) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bvs() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if overflow set (V is 1)
         if(((CC & 0x02)) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bpl() {
-    	 PC = ((int)(PC & 0x0FFFF) + 1);
-        byte offset = mem[(int)PC & 0x0FFFF];
+    	 
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
+        PC = ((int)(PC & 0x0FFFF) + 1);
+        cycles=4;
+        Totalcycle+=4;
         System.out.println(offset);
         System.out.println(Integer.toHexString(ACCA));
        // PC = ((int)(PC & 0x0FFFF) + 1);
@@ -627,45 +685,50 @@ public class CPU implements Runnable {
     }
     private void bmi() {
 
-        byte offset = mem[PC];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if minus (N is 1)
         if(((CC & 0x08)) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bge() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if greater or equal 0
         if((((CC & 0x08)) ^ (CC & 0x02)) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void blt() { //mmmmm BLT
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if less than 0
         if((((CC & 0x08)) ^ (CC & 0x02)) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void bgt() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if greater than 0
         if(((CC & 0x04) | ((CC & 0x08) ^ (CC & 0x02))) == 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
     }
     private void ble() {
 
-        byte offset = mem[(int)PC & 0x0FFFF];
+        byte offset = mem[(int)(PC+1) & 0x0FFFF];
         PC = ((int)(PC & 0x0FFFF) + 1);
-
+        cycles=4;
+        Totalcycle+=4;
         //branch if less than or equal to 0
         if(((CC & 0x04) | ((CC & 0x08) ^ (CC & 0x02))) != 0)
             PC = ((int)(PC & 0x0FFFF) + offset);
@@ -673,9 +736,13 @@ public class CPU implements Runnable {
     //oh my god branches are done, someone up there likes me
     private void tsx() {
         IX = (mem[SP] + 1);
+        cycles=4;
+        Totalcycle+=4;
     }
     private void ins() {
         SP = (SP+1);
+        cycles=4;
+        Totalcycle+=4;
     }
     private void pul(char loc, int addr) {
         if(loc == 'a') {
@@ -685,12 +752,19 @@ public class CPU implements Runnable {
             SP = (SP + 1);
             ACCB = mem[SP]; }
         System.out.println(ACCB);
+        cycles=4;
+        Totalcycle+=4;
+        
     }
     private void des() {
         SP = (SP - 1);
+        cycles=4;
+        Totalcycle+=4;
     }
     private void txs() {
         SP = (IX - 1);
+        cycles=4;
+        Totalcycle+=4;
     }
     private void psh(char loc, int addr) {
         addr = SP;
@@ -701,6 +775,8 @@ public class CPU implements Runnable {
             mem[SP] = ACCB;
 
         SP = (SP - 1);
+        cycles=4;
+        Totalcycle+=4;
     }
     private void neg(char loc, int addr) {
         if(loc == 'a') {
@@ -725,7 +801,8 @@ public class CPU implements Runnable {
             //set V
             if((ACCA & 0x0FF) == 0x80)
                 CC = (byte)(CC | 0x2);
-
+            cycles=2;
+            Totalcycle+=2;
 
         }
         else if(loc == 'b') {
@@ -750,6 +827,8 @@ public class CPU implements Runnable {
             //set V
             if((ACCB & 0x0FF) == 0x80)
                 CC = (byte)(CC | 0x2);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             mem[addr] = (byte)(0 - mem[addr]);
@@ -784,7 +863,7 @@ public class CPU implements Runnable {
                 CC = (byte)(CC | ((ACCA & 0x80) >> 4) & 0x08);
             else
                 CC = (byte)(CC & 0xF7);
-
+            
             //set Z
             if(ACCA == 0)
                 CC = (byte)(CC | 0x04);
@@ -796,6 +875,8 @@ public class CPU implements Runnable {
 
             //set C
             CC = (byte)(CC | 0x01);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             ACCB = (byte)(0xFF - ACCB);
@@ -817,6 +898,8 @@ public class CPU implements Runnable {
 
             //set C
             CC = (byte)(CC | 0x01);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             mem[addr] = (byte)(0xFF - mem[addr]);
@@ -861,6 +944,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x80) ^ ((CC & 0x1) << 7) >> 6));
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             //set C first so we can just use that bit before it's lost
@@ -882,6 +967,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x80) ^ ((CC & 0x1) << 7) >> 6));
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             //set C first so we can just use that bit before it's lost
@@ -932,6 +1019,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         if(loc == 'b') {
             //set C first so we can just use that bit before it's lost
@@ -959,6 +1048,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         if(loc == 'm') {
             //set C first so we can just use that bit before it's lost
@@ -1017,6 +1108,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             byte b7 = (byte)(ACCB & 0x80);
@@ -1045,6 +1138,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             byte b7 = (byte)(mem[addr] & 0x80);
@@ -1101,6 +1196,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
 
@@ -1128,6 +1225,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x8) ^ ((CC & 0x1) << 3)) >> 2);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             //set C
@@ -1184,6 +1283,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x08) ^ (CC & 0x01)));
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             byte b7 = (byte)(ACCB & 0x80);
@@ -1211,6 +1312,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC | ((CC & 0x08) ^ (CC & 0x01 << 7)) >> 6 & 0x02);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             byte b7 = (byte)(mem[addr] & 0x80);
@@ -1263,6 +1366,8 @@ public class CPU implements Runnable {
                 CC = (byte)(CC | 0x02);
             else
                 CC = (byte)(CC & 0xFD);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             byte pre = ACCB;
@@ -1285,6 +1390,8 @@ public class CPU implements Runnable {
                 CC = (byte)(CC | 0x02);
             else
                 CC = (byte)(CC & 0xFD);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             byte pre = mem[addr];
@@ -1332,6 +1439,10 @@ public class CPU implements Runnable {
                 CC = (byte)(CC | 0x02);
             else
                 CC = (byte)(CC & 0xFD);
+            
+            cycles=2;
+            Totalcycle+=2;
+            
         }
         else if(loc == 'b') {
             byte pre = ACCB;
@@ -1354,6 +1465,9 @@ public class CPU implements Runnable {
                 CC = (byte)(CC | 0x02);
             else
                 CC = (byte)(CC & 0xFD);
+            
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             byte pre = mem[addr];
@@ -1400,6 +1514,9 @@ public class CPU implements Runnable {
 
             //clear C
             CC = (byte)(CC & 0xFE);
+            cycles=2;
+            Totalcycle+=2;
+            
         }
         else if(loc == 'b') {
             ACCB = (byte)(ACCB - 0x00);
@@ -1421,6 +1538,8 @@ public class CPU implements Runnable {
 
             //clear C
             CC = (byte)(CC & 0xFE);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             mem[addr] = (byte)(mem[addr] - 0x00);
@@ -1464,6 +1583,8 @@ public class CPU implements Runnable {
 
             //set C
             CC = (byte)(CC & 0xFE);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'b') {
             ACCB = 0x0;
@@ -1479,6 +1600,8 @@ public class CPU implements Runnable {
 
             //set C
             CC = (byte)(CC & 0xFE);
+            cycles=2;
+            Totalcycle+=2;
         }
         else if(loc == 'm') {
             mem[addr] = 0x0;
@@ -1827,6 +1950,8 @@ public class CPU implements Runnable {
 
             //set V
             CC = (byte)(CC & 0xFD);
+            
+            
             System.out.println("A---"+Integer.toHexString(ACCA));
         }
         else if(loc == 'b') {
@@ -2123,7 +2248,6 @@ public class CPU implements Runnable {
     	rel = mem[PC];
     	try
     	{
-    	System.out.println("before eception"+Integer.toHexString(PC));
     	
        
     	}
@@ -2140,10 +2264,11 @@ public class CPU implements Runnable {
         try
         {
         mem[SP] = (byte)((PC) & 0x00FF);
+        System.out.println("-----"+Integer.toHexString(SP)+"  "+mem[SP]);
         SP = (SP - 1);
-        
-
+       
         mem[SP] = (byte)(((PC & 0xFF00) >> 8) & 0x00FF);
+        System.out.println("-----"+Integer.toHexString(SP)+"  "+mem[SP]);
         SP = (SP - 1);
         }
         catch(Exception es)
@@ -2154,7 +2279,9 @@ public class CPU implements Runnable {
         //PC = (byte)(PC + rel);
         //System.out.println(Integer.valueOf(Integer.toHexString((int)rel)));
         
-        PC = PC + rel;// int 
+        PC = (int)((PC + rel)&0x0FFFF);// int 
+        cycles=8;
+        Totalcycle+=8;
         System.out.println(Integer.toHexString(PC));
     }//bsr
 
@@ -2162,9 +2289,11 @@ public class CPU implements Runnable {
 
         mem[SP] = (byte)((PC & 0x00FF));//-1 jsr
         System.out.println("byte"+Integer.toHexString(mem[SP]));
+        System.out.println(Integer.toHexString(SP)+"  "+mem[SP]);
         SP = (SP - 1);
 
         mem[SP] = (byte)(((PC & 0xFF00) >> 8) & 0x00FF);
+        System.out.println(Integer.toHexString(SP)+"  "+mem[SP]);
         SP = (SP - 1);
 
         PC = addr-1;//PC = addr;
@@ -2192,6 +2321,7 @@ public class CPU implements Runnable {
 
         SP = ((high << 8) & 0xFF00);
         SP = SP | (low & 0x00FF);
+        System.out.println(Integer.toHexString(SP));
     }//lds
 
     private void ldx(int addr) {
@@ -2273,14 +2403,21 @@ public class CPU implements Runnable {
                 Thread.sleep(500);
         }
         catch(Exception e) { }
+        cycles=9;
+        Totalcycle+=9;
     }//wai
 
     private void rts() {
         SP = SP + 1;
-        PC = (mem[SP] << 8);
+        System.out.println(Integer.toHexString(mem[SP]));
+        PC = ((mem[SP]&0x00FF) << 8);
+        System.out.println(Integer.toHexString(PC));
         SP = SP + 1;
-        PC = (PC | mem[SP]);
+        System.out.println(Integer.toHexString(mem[SP]));
+        PC = (PC | (mem[SP]&0x00FF));
         System.out.println("RTS:Return:from "+Integer.toHexString(PC));
+        cycles=5;
+        Totalcycle+=5;
     }//rts
 
     private void rti() {
@@ -2300,6 +2437,8 @@ public class CPU implements Runnable {
         PC = (mem[SP] << 8);
         SP = SP + 1;
         PC = (PC | mem[SP]);
+        cycles=10;
+        Totalcycle+=10;
     }//rti
 
     private void swi() {
@@ -2326,6 +2465,8 @@ public class CPU implements Runnable {
 
         PC = (((mem[0xFFFA]) << 8));
         PC = (PC | (mem[0xFFFB]));
+        cycles=12;
+        Totalcycle+=12;
 
     }//swi
 
@@ -2349,7 +2490,7 @@ public class CPU implements Runnable {
 
        file = new File(getClass().getResource("/_emulator/resources/ROM/LOOKUPTABLE.S19").getFile());
        f.parse(file, this);*/
-       File file = new File("Dream6800Rom.hex");
+       File file = new File("D:/Java coursework/dv3/Dream6800Rom.hex");
        //File file = new File(getClass().getResource("chipos.txt").getFile());
        f.parseM6800(file, this);
 
@@ -2578,8 +2719,12 @@ public class CPU implements Runnable {
                         neg('b', 0);
                     } else if (instH == 0x6) {
                         neg('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         neg('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x03:
@@ -2589,8 +2734,12 @@ public class CPU implements Runnable {
                         com('b', 0);
                     } else if (instH == 0x6) {
                         com('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         com('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x04:
@@ -2600,8 +2749,13 @@ public class CPU implements Runnable {
                         lsr('b', 0);
                     } else if (instH == 0x6) {
                         lsr('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         lsr('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
+                        
                     }
                     break;
                 case 0x06:
@@ -2611,8 +2765,12 @@ public class CPU implements Runnable {
                         ror('b', 0);
                     } else if (instH == 0x6) {
                         ror('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         ror('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x07:
@@ -2622,8 +2780,12 @@ public class CPU implements Runnable {
                         asr('b', 0);
                     } else if (instH == 0x6) {
                         asr('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         asr('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x08:
@@ -2633,8 +2795,12 @@ public class CPU implements Runnable {
                         asl('b', 0);
                     } else if (instH == 0x6) {
                         asl('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         asl('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x09:
@@ -2644,8 +2810,12 @@ public class CPU implements Runnable {
                         rol('b', 0);
                     } else if (instH == 0x6) {
                         rol('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         rol('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x0A:
@@ -2655,8 +2825,12 @@ public class CPU implements Runnable {
                         dec('b', 0);
                     } else if (instH == 0x6) {
                         dec('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         dec('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x0C:
@@ -2666,15 +2840,39 @@ public class CPU implements Runnable {
                         inc('b', 0);
                     } else if (instH == 0x6) {
                         inc('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0x7) {
                         inc('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
+                    }
+                    break;
+                    
+                case 0x0D:
+                	if (instH == 0x4) {
+                        tst('a', 0);
+                    } else if (instH == 0x5) {
+                        tst('b', 0);
+                    } else if (instH == 0x6) {
+                        tst('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;
+                    } else if (instH == 0x7) {
+                        tst('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
                 case 0x0E:
                     if (instH == 0x6) {
                         jmp('m', indexed());
+                        cycles=4;
+                        Totalcycle+=-1;
                     } else if (instH == 0x7) {
                         jmp('m', extended());
+                        cycles=3;
+                        Totalcycle+=-1;
                     }
                     break;
                 case 0x0F:
@@ -2684,8 +2882,12 @@ public class CPU implements Runnable {
                         clr('b', 0);
                     } else if (instH == 0x6) {
                         clr('m', indexed());
+                        cycles=7;
+                        Totalcycle+=2;//index add default cycle 5. special 7 add 7-5=2
                     } else if (instH == 0x7) {
                         clr('m', extended());
+                        cycles=6;
+                        Totalcycle+=2;//extended ad M default cycle 4. special 6 add 6-4=2
                         
                     }
                     break;
@@ -2811,17 +3013,29 @@ public class CPU implements Runnable {
                     if (instH == 0x8); //no immediate instruction
                     else if (instH == 0x9) {
                         sta('a', direct());
+                        cycles=4;
+                        Totalcycle+=1;
                     } else if (instH == 0xA) {
                         sta('a', indexed());
+                        cycles=6;
+                        Totalcycle+=1;
                     } else if (instH == 0xB) {
                         sta('a', extended());
+                        cycles=5;
+                        Totalcycle+=1;
                     } else if (instH == 0xC); //no immediate instruction
                     else if (instH == 0xD) {
                         sta('b', direct());
+                        cycles=4;
+                        Totalcycle+=1;
                     } else if (instH == 0xE) {
                         sta('b', indexed());
+                        cycles=6;
+                        Totalcycle+=1;
                     } else if (instH == 0xF) {
                         sta('b', extended());
+                        cycles=5;
+                        Totalcycle+=1;
                     }
                     break;
                 case 0x08:
@@ -2903,12 +3117,20 @@ public class CPU implements Runnable {
                 case 0x0C:
                     if (instH == 0x8) {
                         cpx(immediate());
+                        cycles=3;
+                        Totalcycle+=1;
                     } else if (instH == 0x9) {
                         cpx(direct());
+                        cycles=4;
+                        Totalcycle+=1;
                     } else if (instH == 0xA) {
                         cpx(indexed());
+                        cycles=6;
+                        Totalcycle+=1;
                     } else if (instH == 0xB) {
                         cpx(extended());
+                        cycles=5;
+                        Totalcycle+=1;
                     }
                     break;
                 case 0x0D:
@@ -2917,10 +3139,13 @@ public class CPU implements Runnable {
                     } else if (instH == 0x9); //halt & catch fire
                     else if (instH == 0xA) {
                         jsr(indexed());
-                        
+                        cycles=8;
+                        Totalcycle+=3;
                         
                     } else if (instH == 0xB) {
                         jsr(extended());
+                        cycles=9;
+                        Totalcycle+=5;
                     }
                     break;
                 case 0x0E:
@@ -2928,38 +3153,64 @@ public class CPU implements Runnable {
                         lds(immediateLD());
                     } else if (instH == 0x9) {
                         lds(direct());
+                        cycles=4;
+                        Totalcycle+=1;
                     } else if (instH == 0xA) {
                         lds(indexed());
+                        cycles=6;
+                        Totalcycle+=1;
                     } else if (instH == 0xB) {
                         lds(extended());
+                        cycles=5;
+                        Totalcycle+=1;
                     } else if (instH == 0xC) {
                         ldx(immediateLD());
+
                     } else if (instH == 0xD) {
                         ldx(direct());
+                        cycles=4;
+                        Totalcycle+=1;
                     } else if (instH == 0xE) {
                         ldx(indexed());
+                        cycles=6;
+                        Totalcycle+=1;
                     } else if (instH == 0xF) {
                         ldx(extended());
+                        cycles=5;
+                        Totalcycle+=1;
                     }
                     break;
                 case 0x0F:
                     if (instH == 0x9) {
                         sts(direct());
+                        cycles=5;
+                        Totalcycle+=2;
                     } else if (instH == 0xA) {
                         sts(indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0xB) {
                         sts(extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     } else if (instH == 0xD) {
                         stx(direct());
+                        cycles=5;
+                        Totalcycle+=2;
                     } else if (instH == 0xE) {
                         stx(indexed());
+                        cycles=7;
+                        Totalcycle+=2;
                     } else if (instH == 0xF) {
                         stx(extended());
+                        cycles=6;
+                        Totalcycle+=2;
                     }
                     break;
             }
         }//else
         updated = true;
+        System.out.println("Cycles   "+cycles);
     }//decode
 
    /* public void loadSettings() {
